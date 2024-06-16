@@ -38,13 +38,33 @@ int main(void)
     dfs(0,n-mid,nums1,sums1);
 
     sort(sums0.begin(), sums0.end());
-    sort(sums1.begin(), sums1.end()), greater<>();
+    sort(sums1.begin(), sums1.end(), greater<>());
 
-    ll p0 = 0, p1 = 0;
-    while(true)
+    ll p0 = 0, p1 = 0, result = 0;
+    const ll size0 = sums0.size(), size1 = sums1.size();
+    while(p0 < size0 && p1 < size1)
     {
-        //herererer
+        // printf("p0 %lld p1 %lld", p0, p1);
+        if(sums0[p0] + sums1[p1]<= c)
+        {
+            // printf("    found");
+            result += size1 - p1;
+            ++p0;
+        }
+        else
+        {
+            // printf("    failed");
+            do{
+                if(++p1 >= size1)
+                {
+                    break;
+                }
+            }while(sums1[p1] == sums1[p1-1]);
+        }
+        // printf("\n");
     }
+
+    printf("%lld", result);
 
     return 0;
 }
