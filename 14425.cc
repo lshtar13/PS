@@ -1,6 +1,88 @@
 #include <bits/stdc++.h>
 
 using namespace std;
+typedef long long ll;
+
+class info{
+    public:
+        int level;
+        char c;
+        map<char, info*> childs;
+
+        info(char _c)
+        {
+            c = _c;
+        }
+
+        void push(string &word, int tgt)
+        {
+            if(tgt>=word.size())
+            {
+                return;
+            }
+            if(childs.find(word[tgt]) == childs.end())
+            {
+               childs[word[tgt]] = new info(word[tgt]);
+            }
+            childs[word[tgt]]->push(word, tgt+1);
+        }
+
+        bool find(string &word, int tgt)
+        {
+            if(tgt>=word.size())
+            {
+                return !childs.size();
+            }
+
+            if(childs.find(word[tgt]) == childs.end())
+            {
+                return false;
+            }
+            else
+            {
+                return childs[word[tgt]]->find(word, tgt+1);
+            }
+            
+        }
+};
+
+int main(void)
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n, m;
+    info rootInfo(0);
+    cin>>n>>m;
+
+    for(int i = 0; i<n; ++i)
+    {
+        string word;
+        cin>>word;
+        word += "0";
+        rootInfo.push(word, 0);
+    }
+
+    int result = 0;
+    for(int i = 0; i<m; ++i)
+    {
+        string word;
+        cin>>word;
+        word += "0";
+        result = rootInfo.find(word, 0) ? result + 1: result;
+    }
+
+    cout<<result;
+
+    return 0;
+}
+
+
+/*
+#include <bits/stdc++.h>
+
+using namespace std;
 
 bool search(vector<string> &words, string tgt, int start, int end)
 {
@@ -68,3 +150,4 @@ int main(void)
     printf("%d", result);
     return 0;
 }
+*/
