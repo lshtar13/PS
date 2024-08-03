@@ -61,6 +61,7 @@
     "iostream": "cpp",
     "bitset": "cpp",
     "chrono": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "unordered_map": "cpp"
   }
 }
