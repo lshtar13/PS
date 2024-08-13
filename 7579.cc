@@ -2,6 +2,11 @@
 
 using namespace std;
 typedef long long ll;
+typedef unsigned long long ull;
+
+const ll maxByte = 1e7;
+ll n, m, memSum = 0, memLimit,
+    mems[100] = {0}, costs[100] = {0}, dp[2][maxByte + 1] = {{0}};
 
 int main(void)
 {
@@ -9,45 +14,26 @@ int main(void)
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int n, m, size[101], cost[101], dp[101][];
-
     cin>>n>>m;
-    for(int i = 0; i<n; ++i)
+    for(ll i = 0; i<n; ++i)
     {
-        cin>>size[i];
+        cin>>mems[i];
+        memSum += mems[i];
     }
-    
-    for(int i = 0; i<n; ++i)
+    for(ll i = 0; i<n; ++i)
     {
-        cin>>cost[i];
+        cin>>costs[i];
     }
+    memLimit = memSum - m;
 
-    dp[0][0] = 0;
-    for(int i = 1, totalSize = size[i-1], totalCost = cost[i-1];
-        i<=n; totalSize += size[i],totalCost += cost[i++])
-    {
-        int m0 = min(totalSize, m);
-        for(int l = 0; l <= m0; ++l)
+    for(ll i = 0, mem = mems[i], cost = costs[i]; i<n; ++i, mem = mems[i], cost = costs[i])
+    {       
+        for(ll limit = 0; limit<=memLimit; ++limit)
         {
-            if(totalSize - size[i]<l)
-            {
-                if(l >= size[i])
-                {
-                    dp[i][l] = dp[i-1][l-size[i]] + cost[i];
-                }
-                else
-                {
-                    dp[i][l] = cost[i];
-                }
-            }
-            else
-            {
-                dp[i][l] = min(dp[i-1][l], dp[i-1][l-size[i]]+cost[i]);
-            }
+            dp[1][limit] = limit>=mem ? min(dp[0][limit-mem] + cost, dp[0][limit])
+                                        :dp[0][limit];
         }
     }
-
-    cout<<dp[n][m];
 
     return 0;
 }

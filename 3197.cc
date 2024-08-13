@@ -4,7 +4,7 @@ using namespace std;
 typedef long long ll;
 typedef unsigned long long ull;
 
-int r, c, iceberg[1501*1501] = {0} parent[1501*1501] = {0};
+int r, c, parent[1500*1501] = {0}, swans[2] = {0}, s = 0;
 
 int main(void)
 {
@@ -13,24 +13,30 @@ int main(void)
     cout.tie(NULL);
 
     cin>>r>>c;
-    for(int i = 1; i<=r; ++i)
+    
+    char ice;
+    for(int i = 0; i<=r; ++i)
     {
         for(int l = 1; l<c; ++l)
         {
-            char ice;
+            int idx = i*1501 + l; 
             cin>>ice;
-            switch(ice)
+            if(ice == '.')
             {
-                case '.':
                 
-                break;
-                case 'X':
-                break;
-                case 'L':
-                break;
+            }
+            else if(ice == 'X')
+            {
+
+            }
+            else
+            {
+
             }
         }
     }
+
+    
 
     return 0;
 }
