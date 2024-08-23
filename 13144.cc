@@ -8,7 +8,7 @@ typedef pair<ull, ull> pull;
 typedef const ll cll;
 
 cll MAX_N = 1e5;
-ull n, nums[MAX_N] = {0}, state[MAX_N+1] = {0}, st, en;
+ull n, result, nums[MAX_N] = {0}, state[MAX_N+1] = {0}, st, en;
 
 int main(void)
 {
@@ -22,15 +22,19 @@ int main(void)
         cin>>nums[i];
     }
 
-    st = en = 0;
-    while(en<=n)
+    st = en = 0, result = 0;
+    while(en<n)
     {
-        ++state[nums[++en]];
-        while(state[nums[en]]> 1)
+        ++state[nums[en++]];
+        while(state[nums[en-1]] > 1)
         {
-            state
+            --state[nums[st++]];
         }
+        // cout<<st<<" "<<en<<"\n";
+        result += en-st;
     }
+
+    cout<<result<<"\n";
 
     return 0;
 }
