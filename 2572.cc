@@ -13,7 +13,7 @@ typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
 
 cll MAX_N = 1000, MAX_M = 500, MAX_K = 10000;
-ll n, m, k, cards[MAX_N+1] = {}, roads[MAX_M+1][MAX_M+1] = {{}}, dp[MAX_N+1][MAXM+1] = {{}};
+ll n, m, k, cards[MAX_N+1] = {}, roads[MAX_M+1][MAX_M+1] = {{}}, dp[MAX_N+1][MAX_M+1] = {{}};
 
 ll search(ll c, ll v)
 {
@@ -49,12 +49,15 @@ int main(void)
     cin>>n;
     for(ll i = 1; i<=n; ++i)
     {
-        cin>>cards[i];
+        char c;
+        cin>>c;
+        cards[i] = c;
     }
 
     cin>>m>>k;
-    for(ll a, b, c, i = 0; i<k; ++k)
+    for(ll a, b, i = 0; i<k; ++i)
     {
+        char c;
         cin>>a>>b>>c;
         roads[a][b] = roads[b][a] = c;
     }
