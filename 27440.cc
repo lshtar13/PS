@@ -12,35 +12,22 @@ typedef priority_queue<ll> pqll;
 typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
 
-unordered_map<ll, ll> dp;
+cll N = 1e7;
 ll n;
+unordered_map<ll, ll> dp;
 
 ll search(ll k)
 {
-    if(dp[k])
+    if (dp[k])
     {
         return dp[k];
     }
-    else if(k == 1)
+    else if (k <= 1)
     {
-        return dp[k] = 0;
+        return 0;
     }
 
-    ll result = k;
-    
-    // 이분탐색으로 2와 3으로 최대 절삭 범위 구하기
-    
-    if(k%3 == 0)
-    {
-        result = min(result, k/3 + search(k%3));
-    }
-    if(k%2 == 0)
-    {
-        result = min(result, k/2 + search(k%2));
-    }
-    result = min(result, 1+search(k-1));
-
-    return dp[k] = result;
+    return dp[k] = min(search(k / 2) + k % 2, search(k / 3) + k % 3) + 1;
 }
 
 int main(void)
@@ -49,9 +36,8 @@ int main(void)
     cin.tie(NULL);
     cout.tie(NULL);
 
-    cin>>n;
-
-    cout<<search(n)<<"\n";
+    cin >> n;
+    cout << search(n) << "\n";
 
     return 0;
 }
