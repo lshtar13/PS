@@ -12,60 +12,33 @@ typedef priority_queue<ll> pqll;
 typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
 
-void solve(ll n, ll a, ll b)
+void solve(ll n, ll ab[])
 {
-    priority_queue<pair<ll, pll>, vector<pair<ll, pll>>, greater<pair<ll, pll>>> pqA, pqB;
-    for(ll k, da, db, i = 0; i<n; ++i)
+    ll result = 0, team[1000][3] = {{}};
+    pqpll pq;
+    for (ll i = 0; i < n; ++i)
     {
-        cin>>k>>da>>db;
-        if(da < db)
-        {
-            pqA.push(make_pair(da, make_pair(k, db)));
-        }
-        else
-        {
-            pqB.push(make_pair(db, make_pair(k, da)));
-        }
+        cin >> team[i][0] >> team[i][1] >> team[i][2];
+        pq.push(make_pair(abs(team[i][1] - team[i][2]), i));
     }
 
-    ll result = 0;
-    while(!pqA.empty())
+    while (!pq.empty())
     {
-        ll da = pqA.top().first, k = pqA.top().second.first, db = pqA.top().second.second,
-            balloon = min(k, a);
-        pqA.pop();
-        result += balloon*da, a -= balloon;
-        if(balloon < k)
-        {
-            pqB.push(make_pair(db, make_pair(k - balloon, da)));
-        }
-    }
+        ll consume, i = pq.top().second, _ab = team[i][1] > team[i][2];
+        pq.pop();
 
-    while(!pqB.empty())
-    {
-        ll db = pqB.top().first, k = pqB.top().second.first, da = pqB.top().second.second,
-            balloon = min(k, b);
-        pqB.pop();
-        result += balloon*db, b -= balloon;
-        if(balloon < k)
-        {
-            pqA.push(make_pair(da, make_pair(k - balloon, db)));
-        }
-    }
-    
-    while(!pqA.empty())
-    {
-        ll da = pqA.top().first, k = pqA.top().second.first, db = pqA.top().second.second,
-            balloon = min(k, a);
-        pqA.pop();
-        result += balloon*da, a -= balloon;
-        if(balloon < k)
-        {
-            pqB.push(make_pair(db, make_pair(k - balloon, da)));
-        }
-    }
+        // near
+        consume = min(ab[_ab], team[i][0]);
+        ab[_ab] -= consume, team[i][0] -= consume,
+            result += consume * team[i][_ab + 1];
 
-    cout<<result<<"\n";
+        // far
+        _ab = !_ab;
+        consume = min(ab[_ab], team[i][0]);
+        ab[_ab] -= consume, team[i][0] -= consume,
+            result += consume * team[i][_ab + 1];
+    }
+    cout << result << "\n";
 }
 
 int main(void)
@@ -74,11 +47,10 @@ int main(void)
     cin.tie(NULL);
     cout.tie(NULL);
 
-    for(ll n, a, b; cin>>n>>a>>b && (n || a || b);)
+    for (ll n, ab[2] = {}; cin >> n >> ab[0] >> ab[1] && (n || ab[0] || ab[1]);)
     {
-        solve(n, a, b);
+        solve(n, ab);
     }
-
 
     return 0;
 }
