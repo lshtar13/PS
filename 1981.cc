@@ -15,40 +15,39 @@ typedef vector<ll> vll;
 cll MAX_N = 100;
 ll n, mat[MAX_N][MAX_N] = {{}}, directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
-bool isValidCord(pll c)
+inline bool isValidCord(ll i, ll l)
 {
-    return c.first >= 0 && c.first < n && c.second >= 0 && c.second < n;
+    return i >= 0 && i < n && l >= 0 && l < n;
 }
 
 bool isValid(ll gap)
 {
-    // herere
-    vll minV[MAX_N][MAX_N] = {{}}, maxV[MAX_N][MAX_N] = {{}};
-    queue<pair<pll, pll>> q;
-    q.push(make_pair(make_pair(0, 0), make_pair(mat[0][0], mat[0][0])));
+    vector<vll> maxV(n, vll(n, 201)), minV(n, vll(n, -1));
+    qll q;
+    q.push(0);
+    maxV[0][0] = mat[0][0], minV[0][0] = mat[0][0];
     while (!q.empty())
     {
-        ll i = q.front().first.first, l = q.front().first.second, maxV = q.front().second.first, minV = q.front().second.second;
+        ll i = q.front() / n, l = q.front() % n;
         q.pop();
         if (i == n - 1 && l == n - 1)
         {
             return true;
         }
 
-        for (pll d : {pll(i + 1, l), pll(i - 1, l), pll(i, l + 1), pll(i, l - 1)})
+        for (auto &d : directions)
         {
-            if (!isValidCord(d) || visited[d.first][d.second])
+            ll _i = i + d[0], _l = l + d[1];
+            if (!isValidCord(_i, _l))
             {
                 continue;
             }
 
-            pll minmax = make_pair(max(maxV, mat[d.first][d.second]),
-                                   min(minV, mat[d.first][d.second]));
-            visited[d.first][d.second] = 1;
-
-            if (gap >= minmax.first - minmax.second)
+            ll _maxV = max(maxV[i][l], mat[_i][_l]), _minV = min(minV[i][l], mat[_i][_l]);
+            if ((_maxV < maxV[_i][_l] || _minV > minV[_i][_l]) && (_maxV - _minV <= gap))
             {
-                q.push(make_pair(d, minmax));
+                maxV[_i][_l] = _maxV, minV[_i][_l] = _minV;
+                q.push(_i * n + _l);
             }
         }
     }
@@ -58,23 +57,26 @@ bool isValid(ll gap)
 
 int main(void)
 {
+    // auto start = chrono::high_resolution_clock::now();
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
 
+    ll mx = 0, mn = 200;
     cin >> n;
     for (ll i = 0; i < n; ++i)
     {
         for (ll l = 0; l < n; ++l)
         {
             cin >> mat[i][l];
+            st = min(mx, mat[i][l]), en = max(mn, mat[i][l]);
         }
     }
 
-    ll st = 0, en = 200, mid, ans;
+    ll st = mx - mn, en = 0, mid, ans;
     while (st <= en)
     {
-        cout << st << " " << en << '\n';
+        // cout << st << " " << en << '\n';
         mid = (st + en) / 2;
         if (isValid(mid))
         {
@@ -88,5 +90,8 @@ int main(void)
 
     cout << ans << "\n";
 
+    // auto end = chrono::high_resolution_clock::now();
+    // auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+    // cout << "실행 시간: " << duration.count() << "ms" << "\n";
     return 0;
 }
