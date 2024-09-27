@@ -13,48 +13,15 @@ typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
 
 cll N = 1000, W = 10000, INF = 1e7;
-ll n, w, stations[N][2] = {{}}, parents[N] = {};
+ll n, w, stations[N][2] = {{}};
 double m;
-vector<vll> childs(N);
-vector<vector<double>> mat(N, vector<double>(N, -INF));
-
-ll _parent(ll a)
-{
-    if (parents[a] == a)
-    {
-        return a;
-    }
-    return parents[a] = _parent(parents[a]);
-}
-
-void merge(ll a, ll b)
-{
-    childs[a].insert(childs[a].end(), childs[parents[b]].begin(), childs[parents[b]].end());
-    parents[b] = _parent(a);
-}
+vector<vector<double>> mat(N, vector<double>(N, INF));
+vector<double> dist(N, INF);
 
 double _dist(ll i, ll l)
 {
-    double a = abs(mat[i][0] - mat[l][0]), b = abs(mat[i][1] - mat[l][1]);
+    double a = abs(stations[i][0] - stations[l][0]), b = abs(stations[i][1] - stations[l][1]);
     return sqrt(pow(a, 2) + pow(b, 2));
-}
-
-double dist(ll p0, ll p1)
-{
-    double result = INF;
-    for (auto &i : childs[p0])
-    {
-        for (auto &l : childs[p1])
-        {
-            double d = _dist(i, l);
-            if (d <= m)
-            {
-                result = min(result, d);
-            }
-        }
-    }
-
-    return result;
 }
 
 int main(void)
@@ -67,30 +34,59 @@ int main(void)
     for (ll i = 0; i < n; ++i)
     {
         cin >> stations[i][0] >> stations[i][1];
-        parents[i] = i;
-        childs[i].emplace_back(i);
+        mat[i][i] = 0;
     }
 
     for (ll a, b, i = 0; i < w; ++i)
     {
         cin >> a >> b;
-        merge(--a, --b);
+        --a, --b;
+        mat[a][b] = mat[b][a] = 0;
     }
 
     for (ll i = 0; i < n; ++i)
     {
-        for (ll l = 0; l < n; ++l)
+        for (ll l = i + 1; l < n; ++l)
         {
-            ll p0 = _parent(i), p1 = _parent(l);
-            if (p0 != p1 && mat[p0][p1] == -INF)
+            double d;
+            if (mat[i][l] && mat[l][i] && (d = _dist(i, l)) <= m)
             {
-                mat[p0][p1] = mat[p1][p0] = dist(p0, p1);
+                mat[i][l] = mat[l][i] = d;
             }
         }
     }
 
-    cout << mat[0][4] << "\n";
-    cout << parents[0] << " " << parents[4] << "\n";
+    typedef pair<ll, double> plld;
+    priority_queue<plld, vector<plld>, greater<plld>> pq;
+    dist[0] = 0;
+    pq.push(make_pair(0, 0));
+    while (!pq.empty())
+    {
+        ll node = pq.top().first;
+        double distance = pq.top().second;
+        pq.pop();
+        if (dist[node] != distance)
+        {
+            continue;
+        }
+
+        for (ll i = 0; i < n; ++i)
+        {
+            if (i == node)
+            {
+                continue;
+            }
+            double _distance = distance + mat[node][i];
+            if (_distance < dist[i])
+            {
+                dist[i] = _distance;
+                pq.push(make_pair(i, _distance));
+            }
+        }
+    }
+
+    ll result = dist[n - 1] * 1000;
+    cout << result << "\n";
 
     return 0;
 }
