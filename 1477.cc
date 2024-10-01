@@ -28,6 +28,8 @@ int main(void)
         cin >> area;
         rest.insert(area);
     }
+    rest.insert(0);
+    rest.insert(len);
 
     ll st = 1, en = LEN, ans,
        mid, prev, _m;
