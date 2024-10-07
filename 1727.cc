@@ -29,7 +29,7 @@ ll search(ll i, ll l)
     dp[i][l] = INF;
     dp[i][l] = min(dp[i][l], search(i - 1, l - 1) + abs(male[i] - female[l]));
     ll _i = i, _l = l, &dom = _i > _l ? _i : _l;
-    while (_i != _l)
+    if (_i != _l)
     {
         --dom;
         dp[i][l] = min(dp[i][l], search(_i, _l));
