@@ -6,43 +6,33 @@ typedef unsigned long long ull;
 typedef pair<ll, ll> pll;
 typedef pair<ull, ull> pull;
 typedef const ll cll;
+typedef queue<ll> qll;
+typedef queue<pll> qpll;
 typedef priority_queue<ll> pqll;
 typedef priority_queue<pll> pqpll;
+typedef vector<ll> vll;
+typedef vector<vll> vvll;
 
-ll n, npos[2] = {0}, chess[10][10] = {}, pos[2][100][2] = {}, dxdy[4][2] = {{1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
+cll N = 10;
+ll n, chess[N][N] = {{}}, isPlaced0[2 * N] = {}, isPlaced1[2 * N] = {};
 
-ll search(ll k)
+ll search(ll i, ll l)
 {
-    ll result = 0;
-    for(ll idx = 0, i = pos[k][idx][0], l = pos[k][idx][1]; 
-        idx<npos[k]; ++idx, i = pos[k][idx][0], l = pos[k][idx][1])
+    if (l >= n)
     {
-        if(!chess[i][l])
-        {
-            continue;
-        }
+        ++i, l = 1 - (n % 2);
+    }
+    if (i >= n)
+    {
+        return 0;
+    }
 
-        vector<pll> modified;
-        chess[i][l] = 0;
-        modified.push_back(make_pair(i, l));
-        for(ll d = 0; d<4; ++d)
-        {
-            for(ll a = i, b = l; a<n && b<n && a>=0 && b>=0; a += dxdy[d][0], b += dxdy[d][1])
-            {
-                if(chess[a][b])
-                {
-                    chess[a][b] = 0;
-                    modified.push_back(make_pair(a, b));
-                }
-            }
-        }
-        result = max(result, search(k)+1);
-        for(auto &p: modified)
-        {
-            chess[p.first][p.second] = 1;
-        }
-
-        chess[i][l] = 1;
+    ll a = i + l, b = i + n - 1 - l, result = search(i, l + 2);
+    if (chess[i][l] && !isPlaced0[a] && !isPlaced1[b])
+    {
+        isPlaced0[a] = isPlaced1[b] = 1;
+        result = max(search(i, l + 2) + 1, result);
+        isPlaced0[a] = isPlaced1[b] = 0;
     }
 
     return result;
@@ -54,25 +44,16 @@ int main(void)
     cin.tie(NULL);
     cout.tie(NULL);
 
-    memset(chess, -1, sizeof(chess));
-    cin>>n;
-    for(ll i = 0; i<n; ++i)
+    cin >> n;
+    for (ll i = 0; i < n; ++i)
     {
-        for(ll l = 0; l<n; ++l)
+        for (ll l = 0; l < n; ++l)
         {
-            cin>>chess[i][l];
-            if(chess[i] && (i+l)%2)
-            { 
-                pos[1][npos[1]][0] = i, pos[1][npos[1]++][1] = l;
-            }
-            else if(chess[i] && (i+l)%2 == 0)
-            { 
-                pos[0][npos[0]][0] = i, pos[0][npos[0]++][1] = l;
-            }
+            cin >> chess[i][l];
         }
     }
 
-    cout<<search(0) + search(1)<<"\n";
+    cout << search(0, 0) + search(0, 1) << "\n";
 
     return 0;
 }
