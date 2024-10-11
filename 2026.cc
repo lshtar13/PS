@@ -27,7 +27,7 @@ bool search(vll &nodes, ll idx)
         }
         return true;
     }
-    else if (idx >= n)
+    else if (n - idx < k - nodes.size())
     {
         return false;
     }
