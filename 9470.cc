@@ -15,11 +15,11 @@ typedef vector<vll> vvll;
 
 cll M = 1000;
 
-void slove(void)
+void solve(void)
 {
     ll k, m, p, degree[M] = {}, order[M] = {};
-    vvll edges(m);
     cin >> k >> m >> p;
+    vvll edges(m);
     for (ll a, b, i = 0; i < p; ++i)
     {
         cin >> a >> b;
@@ -32,11 +32,12 @@ void slove(void)
     {
         if (!degree[i])
         {
-            order[i] = 1;
+            order[i] = 1001;
             q.push(i);
         }
     }
 
+    ll result;
     while (!q.empty())
     {
         ll node = q.front();
@@ -44,19 +45,25 @@ void slove(void)
 
         for (auto &av : edges[node])
         {
-            if (order[av] == order[node])
+            if (order[av] / 1000 == order[node] / 1000)
             {
-                
+                ++order[av];
+            }
+            else
+            {
+                order[av] = max(order[av], order[node]);
             }
 
             if (!--degree[av])
             {
+                order[av] = (order[av] / 1000 + (order[av] % 1000 > 1)) * 1000 + 1;
                 q.push(av);
+                result = order[av];
             }
         }
     }
 
-    cout << k;
+    cout << k << " " << result / 1000 << "\n";
 }
 
 int main(void)
