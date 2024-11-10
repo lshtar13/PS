@@ -11,6 +11,13 @@ typedef queue<pll> qpll;
 typedef priority_queue<ll> pqll;
 typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
+typedef vector<pll> vpll;
+typedef vector<vll> vvll;
+typedef vector<vpll> vvpll;
+#define FOR1(a, A) for (ll a = 0; a < A; ++a)
+#define FOR2(a, b, A, B)                                                       \
+  for (ll a = 0; a < A; ++a)                                                   \
+    for (ll b = 0; b < B; ++b)
 
 int main(void)
 {
@@ -18,8 +25,6 @@ int main(void)
     cin.tie(NULL);
     cout.tie(NULL);
 
-    string s = "hello";
-    cout << s * 10 << "\n";
 
     return 0;
 }
