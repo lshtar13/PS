@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -15,107 +16,71 @@ typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
 #define FOR1(a, A) for (ll a = 0; a < A; ++a)
-#define FOR2(a, b, A, B)       \
-    for (ll a = 0; a < A; ++a) \
-        for (ll b = 0; b < B; ++b)
+#define FOR2(a, b, A, B)                                                       \
+  for (ll a = 0; a < A; ++a)                                                   \
+    for (ll b = 0; b < B; ++b)
 
-cll N = 1e5, M = 1e5, K = 1e5;
+cll N = 1e5, M = 1e5, K = 1e5, INF = 1e9 + 1;
 ll n, m, limit;
-vpll db;
+map<ll, ll> db;
 
-pll &find(ll k)
-{
-    ll st = 0, en = db.size() - 1, mid, _k, _st = st, _en = en;
-    while (st <= en)
-    {
-        mid = (st + en) / 2;
-        if (db[mid].first < k)
-        {
-            st = mid + 1, _st = mid;
-        }
-        else
-        {
-            en = mid - 1, _en = mid;
-        }
-    }
-    // cout << _st << " " << _en << "\n";
-    if (db[_st].first > k || db[_en].first < k)
-    {
-        return db[0];
-    }
-    else if (k - db[_st].first > limit && db[_en].first - k > limit)
-    {
-        return db[0];
-    }
+ll find(ll k) {
+  auto it = db.lower_bound(k);
+  if (it == db.end()) {
+    --it;
+    if (it->first < k && k - it->first > limit)
+      return -2;
+  } else if (it == db.begin()) {
+    if (it->first > k && it->first - k > limit)
+      return -2;
+  } else {
+    auto lower = prev(it);
+    if (it->first - k > limit && k - lower->first > limit)
+      return -2;
+    if (k - lower->first < it->first - k)
+      it = lower;
+    else if (k - lower->first == it->first - k)
+      return -1;
+  }
 
-    if (k - db[_st].first < db[_en].first - k)
-    {
-        return db[_st];
-    }
-    else if (k - db[_st].first > db[_en].first - k)
-    {
-        return db[_en];
-    }
-    else
-    {
-        return db[0];
-    }
+  return it->first;
 }
 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
+int main(void) {
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
 
-    db.emplace_back(make_pair(-1, -1));
-    db.emplace_back(make_pair(1e9 + 1, -1));
+  cin >> n >> m >> limit;
+  for (ll k, v, i = 0; i < n; ++i) {
+    cin >> k >> v;
+    db[k] = v;
+  }
 
-    cin >> n >> m >> limit;
-    for (ll k, v, i = 0; i < n; ++i)
-    {
-        cin >> k >> v;
-        db.emplace_back(make_pair(k, v));
+  for (ll cmd, k, v, key, i = 0; i < m; ++i) {
+    cin >> cmd >> k;
+    if (cmd == 1) {
+      cin >> v;
+      db[k] = v;
     }
-    sort(db.begin(), db.end());
-
-    for (ll cmd, k, v, left, right, i = 0; i < m; ++i)
-    {
-        cin >> cmd >> k;
-        if (cmd == 1)
-        {
-            cin >> v;
-            db.emplace_back(make_pair(k, v));
-            sort(db.begin(), db.end());
-            // cout << "---------\n";
-            // for (auto &p : db)
-            // {
-            //     cout << p.first << " " << p.second << "\n";
-            // }
-            // cout << "---------\n";
-        }
-        if (cmd == 2)
-        {
-            cin >> v;
-            auto &p = find(k);
-            if (p.first != -1)
-            {
-                p.second = v;
-            }
-        }
-        if (cmd == 3)
-        {
-            auto &p = find(k);
-            if (p.first != -1)
-            {
-                cout << p.second << "\n";
-            }
-            else
-            {
-                cout << -1 << "\n";
-            }
-        }
+    if (cmd == 2) {
+      cin >> v;
+      key = find(k);
+      if (key >= 0) {
+        db[key] = v;
+      }
     }
+    if (cmd == 3) {
+      key = find(k);
+      if (key >= 0) {
+        cout << db[key] << "\n";
+      } else if (key == -1) {
+        cout << "?" << "\n";
+      } else {
+        cout << "-1" << "\n";
+      }
+    }
+  }
 
-    return 0;
+  return 0;
 }
