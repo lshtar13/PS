@@ -19,12 +19,20 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
+int main(void) {
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
+  deque<ll> dq;
 
+  dq.emplace_back(1);
+  dq.emplace_back(2);
+  dq.emplace_back(3);
 
-    return 0;
+  auto it = dq.begin();
+  cout << *it << "\n";
+  dq.emplace_front(9);
+  cout << *(it + 1) << "\n";
+
+  return 0;
 }
