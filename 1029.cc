@@ -19,35 +19,27 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-cll N = 15, PRICE = 10;
-ll n, mat[N][N] = {{}}, dp[1 << 15][N][10];
+cll N = 15, PRICE = 10, INF = 1000;
+ll n, mat[N][N] = {{}};
+vvll dp(1 << 15, vll(N, INF));
 
-ll solve(ll status, ll owner, ll cur) {
-  if (dp[status][owner][cur] != -1) {
-    return dp[status][owner][cur];
-  }
-
-  ll result = 0;
-  for (ll buyer = 0; buyer < n; ++buyer) {
-    if (status & (1 << buyer)) {
+void solve(ll status, ll last_owner) {
+  for (ll _status, buyer = 0; buyer < n; ++buyer) {
+    if (status & buyer) {
       continue;
-    } else if (mat[owner][buyer] < cur) {
+    } else if (mat[last_owner][buyer] < dp[status][last_owner]) {
       continue;
     }
+    _status = status | (1 << buyer);
 
-    result =
-        max(result, solve(status | (1 << buyer), buyer, mat[owner][buyer]) + 1);
+    dp[_status][buyer] = min(dp[_status][buyer], mat[last_owner][buyer]);
   }
-
-  return dp[status][owner][cur] = result;
 }
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
-
-  memset(dp, -1, sizeof(dp));
 
   cin >> n;
   for (ll i = 0; i < n; ++i) {
@@ -59,7 +51,8 @@ int main(void) {
     }
   }
 
-  cout << solve(1, 0, 0) + 1 << "\n";
+  dp[1][0] = 0;
+  solve(1, 0);
 
   return 0;
 }
