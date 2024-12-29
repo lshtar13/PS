@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <tuple>
 
 using namespace std;
 typedef long long ll;
@@ -20,39 +19,53 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-typedef tuple<ll, ll, ll, ll> info_t;
-
-cll N = 1e5, INF = 1e9 + 1;
-ll n;
-deque<info_t> logs, prv;
+cll N_BIT = 101, K = 1e18;
+ll k, dp[N_BIT][3] = {{}};
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
 
-  cin >> n;
-  for (ll x1, x2, y, i = 0; i < n; ++i) {
-    cin >> x1 >> x2 >> y;
-    logs.emplace_back(make_tuple(x1, x2, y, i + 1));
+  dp[0][0] = 0, dp[0][1] = 1, dp[0][2] = 1;
+  for (ll b = 1; b < N_BIT; ++b) {
+    dp[b][0] = dp[b - 1][0] + dp[b - 1][1];
+    dp[b][1] = dp[b - 1][0];
+    dp[b][2] = dp[b][0] + dp[b][1];
   }
 
-  sort(logs.begin(), logs.end());
+  cin >> k;
 
-  for (ll x1, x2, y, idx, i = 0; i < logs.size(); ++i) {
-    tie(x1, x2, y, idx) = logs[i];
+  ll bit, sum, order;
+  stack<ll> s;
+  while (true) {
+    for (bit = 0, sum = 0; sum < k; ++bit) {
+      sum += dp[bit][2];
+    }
 
-    ll topX, bottomX, topY, bottomY;
-    for (ll _x1, _x2, _y, _idx, l = i + 1; l < logs.size(); ++l) {
-      tie(_x1, _x2, _y, _idx) = logs[l];
-      if (x2 < _x1) {
-        break;
-      }
-
-      if
-
+    if (bit > 0) {
+      k = dp[bit - 1][2] - (sum - k) - 1;
+      s.push(bit);
+    } else {
+      break;
     }
   }
+
+  ll prv = 0, cur;
+  string result = "";
+  while (!s.empty()) {
+    cur = s.top();
+    s.pop();
+
+    for (ll i = 0; i < cur - prv - 1; ++i) {
+      result = "0" + result;
+    }
+
+    result = "1" + result;
+    prv = cur;
+  }
+
+  cout << result;
 
   return 0;
 }
