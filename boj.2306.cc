@@ -21,7 +21,7 @@ typedef vector<vpll> vvpll;
 
 cll N = 500;
 ll n, dp[N][N] = {{}};
-string dna;
+char dna[N + 1] = {};
 
 int main(void) {
   ios::sync_with_stdio(false);
@@ -29,7 +29,7 @@ int main(void) {
   cout.tie(NULL);
 
   cin >> dna;
-  n = dna.length();
+  n = strlen(dna);
   for (ll idx = 0; idx < n; ++idx) {
     dp[idx][idx] = 0;
   }
