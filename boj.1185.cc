@@ -23,8 +23,6 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-typedef tuple<ll, ll, ll> info_t;
-
 cll N = 1e4, P = 1e5;
 ll n, p, taxs[N] = {};
 vpll edges[N];
@@ -46,7 +44,8 @@ int main(void) {
   }
 
   ll st = min_element(taxs, taxs + n) - taxs, cost = taxs[st];
-  set<ll> included = {st};
+  bool included[N] = {};
+  included[st] = true;
   priority_queue<pll, vector<pll>, greater<pll>> pq;
   for (auto &p : edges[st]) {
     pq.push(make_pair(taxs[p.first] + taxs[st] + p.second * 2, p.first));
@@ -56,13 +55,14 @@ int main(void) {
     tie(added, to) = pq.top();
     pq.pop();
 
-    if (!included.insert(to).second) {
+    if (included[to]) {
       continue;
     }
 
     cost += added;
+    included[to] = true;
     for (auto &p : edges[to]) {
-      if (included.find(p.first) == included.end()) {
+      if (!included[p.first]) {
         pq.push(make_pair(taxs[p.first] + taxs[to] + p.second * 2, p.first));
       }
     }
