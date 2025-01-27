@@ -19,23 +19,10 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-cll N = 100, M = 5000;
-ll n, m;
-vll notebook[N];
-
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
-
-  cin >> n >> m;
-  for (ll stu, note, i = 0; i < m; ++i) {
-    cin >> stu >> note;
-    --stu, --note;
-    notebook[stu].emplace_back(note);
-  }
-
-  
 
   return 0;
 }
