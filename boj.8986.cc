@@ -19,13 +19,45 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
+cll N = 1e5, X = 1e9;
+ll n, cords[N] = {};
+
+ull calcDist(ll term) {
+  ull dist = 0;
+  for (ll i = 0; i < n; ++i) {
+    dist += abs(i * term - cords[i]);
+  }
+
+  return dist;
+}
+
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
 
+  cin >> n;
+  for (ll i = 0; i < n; ++i) {
+    cin >> cords[i];
+  }
+
+  ll st = 1, en = X;
+  while (en - st >= 3) {
+    ll sse = (st * 2 + en) / 3, see = (st + en * 2) / 3;
+
+    if (calcDist(sse) < calcDist(see)) {
+      en = see;
+    } else {
+      st = sse;
+    }
+  }
+
+  ull ans = LLONG_MAX;
+  for (ll term = st; term <= en; ++term) {
+    ans = min(ans, calcDist(term));
+  }
+
+  cout << ans << "\n";
+
   return 0;
 }
-
-4 + 5 + 9 = 18
-3 + 6 + 9 = 18
