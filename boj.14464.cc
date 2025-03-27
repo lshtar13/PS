@@ -1,4 +1,6 @@
 #include <bits/stdc++.h>
+#include <functional>
+#include <queue>
 
 using namespace std;
 typedef long long ll;
@@ -19,27 +21,36 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-cll N = 100, M = 100, P = 100, MOD = 1e9 + 7;
-ll n, m, p, dp[N + 1] = {}, fact[N + 1] = {1};
+cll C = 20000, N = 20000;
+ll c, n;
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
 
-  cin >> n >> m >> p;
-  for (ll i = 1; i <= n; ++i) {
-    fact[i] = (fact[i - 1] * i) % MOD;
+  cin >> c >> n;
+  priority_queue<ll, vll, greater<ll>> chicks;
+  priority_queue<pll, vector<pll>, greater<pll>> cows;
+  for (ll i = 0, t; i < c; ++i) {
+    cin >> t;
+    chicks.push(t);
   }
 
-  dp[m] = fact[m];
-  for (ll i = m + 1; i <= p; ++i) {
-    dp[i] = (dp[i - 1] * (n - m)) % MOD;
-    cout << dp[i] << " ";
+  for (ll i = 0, a, b; i < n; ++i) {
+    cin >> a >> b;
+    cows.push({a, b - a});
   }
-  cout << "\n";
 
-  cout << dp[p] << "\n";
+  while (!cows.empty()) {
+    ll t = chicks.top(), st, len;
+    tie(st, len) = cows.top();
+    cows.pop();
+
+    if (t < st) {
+      chicks.pop();
+    }
+  }
 
   return 0;
 }

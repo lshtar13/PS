@@ -11,58 +11,82 @@ typedef queue<pll> qpll;
 typedef priority_queue<ll> pqll;
 typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
+typedef vector<pll> vpll;
+typedef vector<vll> vvll;
+typedef vector<vpll> vvpll;
+#define FOR1(a, A) for (ll a = 0; a < A; ++a)
+#define FOR2(a, b, A, B)                                                       \
+  for (ll a = 0; a < A; ++a)                                                   \
+    for (ll b = 0; b < B; ++b)
 
-ll l, k, c, maxLength, length[10001] = {};
+// binary search(parametic)
 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
-    
-    cin>>l>>k>>c;
-    ++c;
-    set<ll> s;
-    for(ll spot, st = 0, i = 0; i<k; ++i)
-    {
-        cin>>spot;
-        s.insert(spot);
+cll L = 1e9, K = 1e4, C = 1e4;
+ll l, k, c, pts[K + 2] = {};
+
+bool termCheck(ll term) {
+  ll nCut = 0, prv = l;
+  for (ll pt = k; pt >= 0; --pt) {
+    if (prv - pts[pt] > term) {
+      return false;
+    } else if (pt > 0 && prv - pts[pt - 1] > term) {
+      prv = pts[pt], ++nCut;
     }
-    k = s.size(), maxLength = 0;
-    ll prev = 0, i = 0;
-    for(auto &spot : s)
-    {
-        maxLength = max(maxLength, length[i++] = spot - prev), prev = spot;
+  }
+
+  return nCut <= c;
+}
+
+bool firstPtCheck(ll fpt, ll term) {
+  if (pts[fpt] > term) {
+    return false;
+  }
+
+  ll nCut = 1;
+  for (ll prv = pts[fpt], pt = fpt + 1; pt <= k; ++pt) {
+    if (pts[pt] - prv > term) {
+      return false;
+    } else if (pts[pt + 1] - prv > term) {
+      prv = pts[pt], ++nCut;
     }
-    if(*s.rbegin() < l)
-    {
-        length[k++] = l - *s.rbegin();
+  }
+
+  return nCut <= c;
+}
+
+int main(void) {
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
+
+  cin >> l >> k >> c;
+  for (ll pt = 1; pt <= k; ++pt) {
+    cin >> pts[pt];
+  }
+  pts[k + 1] = l;
+  sort(pts, pts + k + 2);
+
+  ll st = 1, en = L, term, firstPt;
+  while (st <= en) {
+    ll mid = (st + en) / 2;
+    if (termCheck(mid)) {
+      term = mid, en = mid - 1;
+    } else {
+      st = mid + 1;
     }
+  }
 
-    ll st, en, mid, sum, _c, result0, result1;
-    for(st = 1, en = l, mid = (st + en)/2; st<en; mid = (st+en)/2)
-    {
-        bool isValid = maxLength<=mid;
-        for(sum = 0, _c = 0, i = k-1; isValid && i>=0; --i)
-        {
-            if((sum += length[i])>mid)
-            {
-                ++_c, sum = length[i];
-            }
-        }
-        
-        if(isValid && _c<=c)
-        {
-            result0 = mid, result1 = sum, en = mid - 1;
-        }
-        else
-        {
-            st = mid + 1;
-        }
+  st = 1, en = k;
+  while (st <= en) {
+    ll mid = (st + en) / 2;
+    if (firstPtCheck(mid, term)) {
+      firstPt = mid, en = mid - 1;
+    } else {
+      st = mid + 1;
     }
+  }
 
+  cout << term << " " << pts[firstPt] << " " << firstPt << "\n";
 
-    cout<<result0<<" "<<result1<<"\n";
-
-    return 0;
+  return 0;
 }
