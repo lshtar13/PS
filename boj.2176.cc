@@ -96,7 +96,7 @@ int main(void) {
     for (auto &p : edges[node]) {
       tie(av, w) = p;
 
-      if (lengths[av] < length) {
+      if (lengths[av] + w == length) {
         dp[node] += dp[av];
       }
     }
