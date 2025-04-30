@@ -34,7 +34,7 @@ ll dfs() {
   checked[0][0] = true;
 
   ll result = 0;
-  map<ll, vpll> reachable;
+  vpll reachable[26];
   for (ll i, l; !q.empty();) {
     tie(i, l) = q.front();
     q.pop();
