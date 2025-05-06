@@ -50,7 +50,10 @@ ll comp(const string &tgt, const string &src, cll n) {
     }
 
     if (i == tgt.length()) {
-      ++result, i = pi[tgt.length() - 1];
+      if (++result > 1) {
+        return result;
+      }
+      i = pi[tgt.length() - 1];
     }
   }
 
