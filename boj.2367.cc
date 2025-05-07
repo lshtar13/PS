@@ -19,9 +19,9 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-cll N = 200, K = 5, D = 100, source = 0, sink = 301, foodStart = 1,
-    memberStart = 101, NODE = 302, INF = N * K + 1;
-ll n, k, d, cap[NODE][NODE] = {{}}, flow[NODE][NODE] = {{}};
+cll N = 200, K = 5, D = 100, NODE = 302, INF = N * K + 1;
+ll n, k, d, source = 0, foodStart = 1, memberStart, sink,
+            cap[NODE][NODE] = {{}}, flow[NODE][NODE] = {{}};
 vpll edges[NODE];
 
 int main(void) {
@@ -35,6 +35,7 @@ int main(void) {
   // members 101 ~ 300
   // sink  301
   cin >> n >> k >> d;
+  memberStart = foodStart + d, sink = memberStart + n;
   for (ll food = foodStart, limit; food < foodStart + d; ++food) {
     cin >> limit;
     cap[source][food] = limit;
