@@ -1,4 +1,6 @@
 #include <bits/stdc++.h>
+#include <ratio>
+#include <string>
 
 using namespace std;
 typedef long long ll;
@@ -14,46 +16,50 @@ typedef vector<ll> vll;
 typedef vector<vll> vvll;
 
 cll N = 10;
-ll n, chess[N][N] = {{}}, isPlaced0[2 * N] = {}, isPlaced1[2 * N] = {};
+ll n;
+bool chess[N][N] = {{}};
+ll lines0[2 * N] = {}, lines1[2 * N] = {};
 
-ll search(ll i, ll l)
-{
-    if (l >= n)
-    {
-        ++i, l = 1 - (n % 2);
-    }
-    if (i >= n)
-    {
-        return 0;
-    }
+inline pll getline(ll i, ll l) { return {i + l, l - i}; }
 
-    ll a = i + l, b = i + n - 1 - l, result = search(i, l + 2);
-    if (chess[i][l] && !isPlaced0[a] && !isPlaced1[b])
-    {
-        isPlaced0[a] = isPlaced1[b] = 1;
-        result = max(search(i, l + 2) + 1, result);
-        isPlaced0[a] = isPlaced1[b] = 0;
-    }
+bool avail(ll i, ll l) {
+  ll k0, k1;
+  tie(k0, k1) = getline(i, l);
 
-    return result;
+  return chess[i][l] && !lines0[k0] && !lines1[k1];
 }
 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
-
-    cin >> n;
-    for (ll i = 0; i < n; ++i)
-    {
-        for (ll l = 0; l < n; ++l)
-        {
-            cin >> chess[i][l];
-        }
-    }
-
-    cout << search(0, 0) + search(0, 1) << "\n";
-
+ll search0(ll num) {
+  ll i = num / n, l = num % n;
+  if (num >= n * n) {
     return 0;
+  } else if (!avail(i, l)) {
+    return search0(num + 2);
+  }
+
+  ll result = 0, k0, k1;
+  result = max(result, search0(num + 2));
+  tie(k0, k1) = getline(i, l);
+  ++lines0[k0], ++lines1[k1];
+  result = max(result, search0(num + 2) + 1);
+  --lines0[k0], --lines1[k1];
+
+  return result;
+}
+
+int main(void) {
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
+
+  cin >> n;
+  for (ll i = 0; i < n; ++i) {
+    for (ll l = 0; l < n; ++l) {
+      cin >> chess[i][l];
+    }
+  }
+
+  cout << search0(0) + search0(1) << "\n";
+
+  return 0;
 }
