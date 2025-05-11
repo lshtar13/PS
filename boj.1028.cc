@@ -61,6 +61,8 @@ int main(void) {
       mat[i][l] = c - '0';
     }
   }
+
+  
   memset(diags, -1, sizeof(diags));
 
   ll result = 0;
