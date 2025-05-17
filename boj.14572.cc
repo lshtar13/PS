@@ -1,6 +1,4 @@
-#include <algorithm>
 #include <bits/stdc++.h>
-#include <utility>
 
 using namespace std;
 typedef long long ll;
@@ -21,32 +19,47 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-cll N = 1e5, L = 1e6;
-ll n, l, dp[2][N];
-vll dp[2]; // up / low
-vpll cords;
+cll N = 1e5, K = 30, D = 1e9;
+ll n, k, d, comp[K] = {}, nmember = 0;
+pll abils[N] = {};
+bool algos[N][K] = {{}};
 
-ll find(ll div, ll idx) {
-  if (dp[div][idx] != -1) {
-    return dp[div][idx];
-  }
+ll join(ll idx) {
+  ++nmember;
+  idx = abils[idx].second;
+  pll result = {0, 0};
+  for (ll algo = 0; algo < k; ++algo) {
+    comp[algo] += algos[idx][algo];
 
-  ll up = cords[idx].first, low = cords[idx].second, dist = abs(up - low) + l,
-     result = dist;
-  if (!div) {
-    for (ll _idx = idx + 1; _idx < n; ++_idx) {
-      if (cords[_idx].second != low) {
-        continue;
-      }
-      result = max(result, find(!div, _idx) + dist);
+    if (comp[algo]) {
+      ++result.first;
     }
-  } else {
-    for (ll _idx = idx + 1; _idx < n && cords[_idx].first == up; ++_idx) {
-      result = max(result, find(!div, _idx) + dist);
+
+    if (comp[algo] == nmember) {
+      ++result.second;
     }
   }
 
-  return dp[div][idx] = result;
+  return (result.first - result.second) * nmember;
+}
+
+ll disjoin(ll idx) {
+  --nmember;
+  idx = abils[idx].second;
+  pll result = {0, 0};
+  for (ll algo = 0; algo < k; ++algo) {
+    comp[algo] -= algos[idx][algo];
+
+    if (comp[algo]) {
+      ++result.first;
+    }
+
+    if (comp[algo] == nmember) {
+      ++result.second;
+    }
+  }
+
+  return (result.first - result.second) * nmember;
 }
 
 int main(void) {
@@ -54,20 +67,25 @@ int main(void) {
   cin.tie(NULL);
   cout.tie(NULL);
 
-  cin >> n >> l;
-  dp[0].resize(n, -1);
-  dp[1].resize(n, -1);
-  cords.resize(n);
-  for (auto &cord : cords) {
-    cin >> cord.first >> cord.second;
-  }
-  sort(cords.begin(), cords.end());
-
-  ll result = 0;
-  for (ll div = 0; div < 2; ++div) {
-    for (ll idx = 0; idx < n; ++idx) {
-      result = max(result, find(div, idx));
+  cin >> n >> k >> d;
+  for (ll i = 0, nalgo, abil; i < n; ++i) {
+    cin >> nalgo >> abil;
+    abils[i] = {abil, i};
+    for (ll l = 0, algo; l < nalgo; ++l) {
+      cin >> algo;
+      algos[i][--algo] = true;
     }
+  }
+
+  sort(abils, abils + n);
+
+  ll result = join(0);
+  for (ll st = 0, en = 1, nresult; en < n; ++en) {
+    while (st < en && abils[en].first - abils[st].first > d) {
+      disjoin(st++);
+    }
+
+    result = max(result, join(en));
   }
 
   cout << result << "\n";
