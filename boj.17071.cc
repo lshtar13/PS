@@ -11,61 +11,58 @@ typedef queue<pll> qpll;
 typedef priority_queue<ll> pqll;
 typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
+typedef vector<pll> vpll;
+typedef vector<vll> vvll;
+typedef vector<vpll> vvpll;
+#define FOR1(a, A) for (ll a = 0; a < A; ++a)
+#define FOR2(a, b, A, B)                                                       \
+  for (ll a = 0; a < A; ++a)                                                   \
+    for (ll b = 0; b < B; ++b)
 
-cll MAX_N = 5e5, MAX_S = 1e3;
-ll n, k, prv, sum[MAX_S] = {};
-char dp[2][MAX_N + 1] = {{}};
+cll N = 5e5, K = 5e5, directions[3][2] = {{1, 1}, {1, -1}, {2, 0}};
+ll n, k, mat[N + 1][2] = {};
 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
+inline bool isValidCord(ll idx) { return idx >= 0 && idx <= N; }
 
-    for (ll i = 1; i < MAX_S; ++i)
-    {
-        sum[i] = sum[i - 1] + i;
+int main(void) {
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
+
+  cin >> n >> k;
+
+  memset(mat, -1, sizeof(mat));
+  qpll q;
+  q.push({n, 0});
+  mat[n][0] = 0;
+  while (!q.empty()) {
+    ll pos = q.front().first, isOdd = q.front().second;
+    q.pop();
+
+    for (auto &d : directions) {
+      ll npos = pos * d[0] + d[1], nisOdd = !isOdd;
+      if (isValidCord(npos) && mat[npos][nisOdd] == -1) {
+        mat[npos][nisOdd] = mat[pos][isOdd] + 1;
+        q.push({npos, nisOdd});
+      }
+    }
+  }
+
+  for (ll t = 0, pos = k + t; pos <= N; pos += ++t) {
+    ll isOdd = t % 2;
+    if (mat[pos][isOdd] == -1) {
+      continue;
     }
 
-    cin >> n >> k;
-
-    qpll q;
-    q.push(make_pair(n, 0));
-    dp[n] = 1;
-    prv = 0;
-    while (!q.empty())
-    {
-        ll pos = q.front().first, cur = q.front().second;
-        q.pop();
-
-        ++cur;
-        if (k + sum[cur] > MAX_N)
-        {
-            continue;
-        }
-
-        
-
-        if (pos * 2 <= MAX_N && !dp[pos * 2])
-        {
-            dp[pos * 2] = 1;
-            q.push(make_pair(pos * 2, cur));
-        }
-        if (pos + 1 <= MAX_N && !dp[pos + 1])
-        {
-            dp[pos + 1] = 1;
-            q.push(make_pair(pos + 1, cur));
-        }
-        if (pos - 1 >= 0 && !dp[pos - 1])
-        {
-            dp[pos - 1] = 1;
-            q.push(make_pair(pos - 1, cur));
-        }
+    if (mat[pos][isOdd] <= t) {
+      cout << t << "\n";
+      goto END;
     }
+  }
 
-    cout << -1;
+  cout << "-1\n";
 
 END:
 
-    return 0;
+  return 0;
 }
