@@ -20,26 +20,31 @@ typedef vector<vpll> vvpll;
     for (ll b = 0; b < B; ++b)
 
 cll N = 1e4, M = 1e4;
-ll n, m, choices[M + 1], spares[N + 1];
+ll n, m, spares[N + 1];
 bool visited[M + 1];
+vll choices[M + 1];
 
 bool find(ll choice, ll student) {
   ll idx = abs(choice), sign = choice / idx, owner;
   visited[idx] = true;
-  if (choices[idx]) {
-    if ((choice < 0 && choices[idx] < 0) || (choice > 0 && choices[idx] > 0)) {
+  if (!choices[idx].empty()) {
+    ll prvSign = choices[idx].front() / abs(choices[idx].front());
+    if (prvSign == sign) {
       return true;
     } else {
-      owner = abs(choices[idx]);
-      if (!visited[idx] && spares[owner] && find(spares[owner], owner)) {
-        choices[idx] = sign * student;
-        return true;
-      } else {
-        return false;
+      for (auto &_owner : choices[idx]) {
+        ll owner = _owner * prvSign;
+        if (!visited[idx] && spares[owner] && find(spares[owner], owner)) {
+        } else {
+          return false;
+        }
       }
+      choices[idx].clear();
+      choices[idx].emplace_back(sign * student);
+      return true;
     }
   } else {
-    choices[idx] = sign * student;
+    choices[idx].emplace_back(sign * student);
     return true;
   }
 }
