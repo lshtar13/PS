@@ -19,21 +19,37 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-cll N = 50, H = 5e5, SUM = 5e5;
-ll n, heights[N] = {}, dp[N][SUM] = {};
+cll H = 100, W = 100;
+ll h, w;
+char mat[H][W] = {{}};
+
+ll solve() {
+  cin >> h >> w;
+  vpll srcs;
+  for (ll i = 0; i < h; ++i) {
+    cin.ignore();
+    for (ll l = 0; l < w; ++l) {
+      cin >> mat[i][l];
+
+      if (mat[i][l] == '$') {
+        srcs.emplace_back(i, l);
+      }
+    }
+  }
+
+  
+}
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
 
-  cin >> n;
-  for (ll i = 0; i < n; ++i) {
-    cin >> heights[i];
+  ll t;
+  cin >> t;
+  while (t--) {
+    cout << solve() << "\n";
   }
-  sort(heights, heights + n);
-
-  
 
   return 0;
 }
