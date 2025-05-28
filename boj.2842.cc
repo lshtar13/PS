@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
-#include <climits>
-#include <deque>
+#include <string>
 
 using namespace std;
 typedef long long ll;
@@ -21,48 +20,43 @@ typedef vector<vpll> vvpll;
   for (ll a = 0; a < A; ++a)                                                   \
     for (ll b = 0; b < B; ++b)
 
-cll N = 50, HEIGHT = 1e6,
-    directions[8][2] = {{0, 1}, {0, -1}, {1, 0},  {-1, 0},
-                        {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-ll n, nTgt = 0, heights[N][N] = {{}};
-pll home;
-bool isTgt[N][N] = {{}};
+cll N = 50, Height = 1e6,
+    directions[8][2] = {{0, 1},  {0, -1}, {1, 0},  {-1, 0},
+                        {1, -1}, {1, 1},  {-1, 1}, {-1, -1}};
+ll n, heights[N][N] = {}, ntgt = 0;
+bool isTgt[N][N] = {{}}, checked[N][N] = {{}};
+pll src;
 
-inline bool isValid(ll i, ll l) { return i < n && i >= 0 && l < n && l >= 0; }
+inline bool isValid(ll i, ll l) { return i >= 0 && i < n && l >= 0 && l < n; }
 
-bool avail(ll minH, ll maxH) {
-  bool visited[N][N] = {{}};
+bool isPossible(ll low, ll high) {
+  ll nget = 0;
+  memset(checked, 0, sizeof(checked));
+  checked[src.first][src.second] = true;
   qpll q;
-  q.push(home);
-  visited[home.first][home.second] = true;
-
-  ll i, l, _i, _l, cnt = 0;
+  q.push(src);
   while (!q.empty()) {
-    tie(i, l) = q.front();
+    ll i = q.front().first, l = q.front().second;
     q.pop();
 
     for (auto &d : directions) {
-      _i = i + d[0], _l = l + d[1];
-      if (!isValid(_i, _l) || visited[_i][_l]) {
+      ll ni = i + d[0], nl = l + d[1];
+      if (isValid(ni, nl) || checked[ni][nl]) {
         continue;
-      } else if (heights[_i][_l] > maxH || heights[_i][_l] < minH) {
+      } else if (heights[ni][nl] < low || heights[ni][nl] > high) {
         continue;
       }
 
-      visited[_i][_l] = true;
-      q.push({_i, _l});
-    }
-  }
-
-  for (ll i = 0; i < n; ++i) {
-    for (ll l = 0; l < n; ++l) {
-      if (isTgt[i][l] && visited[i][l]) {
-        ++cnt;
+      if (isTgt[ni][nl]) {
+        ++nget;
       }
+
+      checked[ni][nl] = true;
+      q.push({ni, nl});
     }
   }
 
-  return cnt == nTgt;
+  return nget == ntgt;
 }
 
 int main(void) {
@@ -77,32 +71,37 @@ int main(void) {
       char c;
       cin >> c;
       if (c == 'P') {
-        home = {i, l};
+        src = {i, l};
       } else if (c == 'K') {
         isTgt[i][l] = true;
-        ++nTgt;
+        ++ntgt;
       }
     }
   }
-
-  vll candidates;
-  FOR2(i, l, n, n) {
-    cin >> heights[i][l];
-    candidates.emplace_back(heights[i][l]);
-  }
-  sort(candidates.begin(), candidates.end());
-
-  ll left = 0, right = 0, result = HEIGHT;
-  while (left <= right && right < candidates.size()) {
-    while (avail(candidates[left], candidates[right])) {
-      result = min(result, candidates[right] - candidates[left]);
-      ++left;
+  for (ll i = 0; i < n; ++i) {
+    for (ll l = 0; l < n; ++l) {
+      cin >> heights[i][l];
     }
-    ++right;
   }
 
-END:
-  cout << result << '\n';
+  ll result = Height;
+  for (ll low = 1; low <= heights[src.first][src.second]; ++low) {
+    ll st = low, en = Height, high = -1;
+    while (st <= en) {
+      ll mid = (st + en) / 2;
+      if (isPossible(low, mid)) {
+        high = mid, en = mid - 1;
+      } else {
+        st = mid + 1;
+      }
+    }
+
+    if (high != -1) {
+      result = min(result, high - low);
+    }
+  }
+
+  cout << result << "\n";
 
   return 0;
 }
