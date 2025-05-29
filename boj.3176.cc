@@ -2,112 +2,111 @@
 
 using namespace std;
 typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef pair<ull, ull> pull;
+typedef const ll cll;
+typedef queue<ll> qll;
+typedef queue<pll> qpll;
+typedef priority_queue<ll> pqll;
+typedef priority_queue<pll> pqpll;
+typedef vector<ll> vll;
+typedef vector<pll> vpll;
+typedef vector<vll> vvll;
+typedef vector<vpll> vvpll;
+#define FOR1(a, A) for (ll a = 0; a < A; ++a)
+#define FOR2(a, b, A, B)                                                       \
+  for (ll a = 0; a < A; ++a)                                                   \
+    for (ll b = 0; b < B; ++b)
 
-const int MAX_STEP = 12, MAX_NODE = 100001;
-int k, n, parent[MAX_STEP+1][MAX_NODE+1] = {{0}},
-    minCost[MAX_STEP+1][MAX_NODE+1] = {{0}}, 
-    maxCost[MAX_STEP+1][MAX_NODE+1] = {{0}}, 
-    depth[MAX_NODE+1] = {0}, minResult, maxResult;
+typedef tuple<ll, ll, ll> info_t;
 
-void fill0(vector<vector<pair<int, int>>>edges, 
-            int node, int _parent, int stage)
-{
-    for(auto p: edges[node])
-    {
-        int child = p.first, cost = p.second;
-        if(child!=_parent)
-        {
-            parent[0][child] = node;
-            minCost[0][child] = maxCost[0][child] = cost;
-            fill0(edges, child, node, stage+1);
-        }
+cll N = 1e5, Length = 1e6, K = 1e5;
+ll n, k, levels[N + 1] = {}, parents[N + 1][20] = {}, dists[N + 1][20][2] = {};
+vpll edges[N + 1];
+// 최소 공통 조상
+
+info_t getInfo(ll node, ll level) {
+  ll dst = node, minDist = Length, maxDist = 0;
+  for (ll i = 0; i < 20; ++i) {
+    if (!(level & (1 << i))) {
+      continue;
     }
-    depth[node] = stage;
+    minDist = min(minDist, dists[dst][i][0]);
+    maxDist = max(maxDist, dists[dst][i][1]);
+    dst = parents[dst][i];
+  }
+
+  return {dst, minDist, maxDist};
 }
 
-void fill1(void)
-{
-    for(int step = 1; step<=MAX_STEP; ++step)
-    {
-        for(int i = 1; i<=n; ++i)
-        {
-            parent[step][i] = parent[step-1][parent[step-1][i]];
-            minCost[step][i] = min(minCost[step-1][i],
-                                minCost[step-1][parent[step-1][i]]);
-            maxCost[step][i] = max(maxCost[step-1][i],
-                                maxCost[step-1][parent[step-1][i]]);
-        }
+pll find0(ll node0, ll node1) {
+  ll st = 0, en = min(levels[node0], levels[node1]), minDist, maxDist;
+  while (st <= en) {
+    ll mid = (st + en) / 2;
+    ll ans0, minDist0, maxDist0, ans1, minDist1, maxDist1;
+
+    tie(ans0, minDist0, maxDist0) = getInfo(node0, levels[node0] - mid);
+    tie(ans1, minDist1, maxDist1) = getInfo(node1, levels[node1] - mid);
+
+    if (ans0 == ans1) {
+      minDist = min(minDist0, minDist1), maxDist = max(maxDist0, maxDist1),
+      st = mid + 1;
+    } else {
+      en = mid - 1;
     }
+  }
+
+  return {minDist, maxDist};
 }
 
-int queryParent(int idx, int n)
-{
-    for(int i = MAX_STEP; i>=0; --i)
-    {
-        if(n&(1<<i))
-        {
-            maxResult = max(maxResult, maxCost[i][idx]);
-            minResult = min(minResult, minCost[i][idx]);
-            idx = parent[i][idx];
-        }
+int main(void) {
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
+
+  cin >> n;
+  for (ll i = 0, a, b, c; i < n - 1; ++i) {
+    cin >> a >> b >> c;
+    edges[a].emplace_back(b, c);
+    edges[b].emplace_back(a, c);
+  }
+
+  qll q;
+  q.push(1);
+  levels[1] = 0, parents[1][0] = 1, dists[1][0][0] = dists[1][0][1] = 0;
+  while (!q.empty()) {
+    ll node = q.front();
+    q.pop();
+
+    for (auto &p : edges[node]) {
+      ll av = p.first, dist = p.second;
+      if (parents[av][0]) {
+        continue;
+      }
+
+      parents[av][0] = node, dists[av][0][0] = dists[av][0][1] = dist,
+      levels[av] = levels[node] + 1;
+      q.push(av);
     }
+  }
 
-    return idx;
-}
-
-void find(int a, int b)
-{
-    int depthA = depth[a], depthB = depth[b],
-        start = 0, end = min(depthA, depthB), mid;
-    maxResult = 0, minResult = INT_MAX;
-    if(!depthA)
-    {
-        queryParent(b, depthB);
+  for (ll step = 1; step < 20; ++step) {
+    for (ll node = 1; node <= n; ++node) {
+      ll prvParent = parents[node][step - 1], prvMin = dists[node][step - 1][0],
+         prvMax = dists[node][step - 1][1];
+      parents[node][step] = parents[prvParent][step - 1];
+      dists[node][step][0] = min(prvMin, dists[prvParent][step - 1][0]);
+      dists[node][step][1] = max(prvMax, dists[prvParent][step - 1][1]);
     }
-    else if(!depthB)
-    {
-        queryParent(a, depthA);
-    }
-    for(mid = (start+end)/2; start<end; mid = (start+end)/2)
-    {
-        int _a = queryParent(a, depthA-mid), _b = queryParent(b, depthB-mid);
-        if(_a == _b)
-        {
-            start = mid+1;
-        }
-        else
-        {
-            end = mid;
-        }
-    }
-}
+  }
 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
+  cin >> k;
+  for (ll i = 0, d, e, minDist, maxDist; i < k; ++i) {
+    cin >> d >> e;
+    tie(minDist, maxDist) = find0(d, e);
+    cout << minDist << " " << maxDist << "\n";
+  }
 
-    cin>>n;
-    
-    vector<vector<pair<int, int>>> edges(n+1);
-    for(int i = 0, a, b, c; i<n-1; ++i)
-    {
-        cin>>a>>b>>c;
-        edges[a].push_back(make_pair(b, c));
-        edges[b].push_back(make_pair(a, c));
-    }
-
-    fill0(edges, 1, 0, 0);
-    fill1();
-
-    cin>>k;
-    for(int i = 0, d, e; i<k; ++i)
-    {
-        cin>>d>>e;
-        find(d, e);
-        cout<<minResult<<" "<<maxResult<<"\n";
-    }
-
-    return 0;
+  return 0;
 }
