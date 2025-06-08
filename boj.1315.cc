@@ -11,51 +11,42 @@ typedef queue<pll> qpll;
 typedef priority_queue<ll> pqll;
 typedef priority_queue<pll> pqpll;
 typedef vector<ll> vll;
-typedef unsigned short us;
+typedef vector<pll> vpll;
+typedef vector<vll> vvll;
+typedef vector<vpll> vvpll;
+#define FOR1(a, A) for (ll a = 0; a < A; ++a)
+#define FOR2(a, b, A, B)                                                       \
+  for (ll a = 0; a < A; ++a)                                                   \
+    for (ll b = 0; b < B; ++b)
 
-ll n, info[50][3] = {{}};
-map<pair<pll, ll>, ll> dp;
+cll N = 50, STR = 1e3, ITN = 1e3, PNT = 1e3;
+ll n, strs[N + 1] = {}, itns[N + 1] = {}, pnts[N + 1] = {},
+               dp[STR + 1][ITN + 1] = {{}};
 
-ll solve(ll it, ll pt, ll q)
-{
-    it %= 1001, pt %= 1001;
-    if (dp.find(make_pair(make_pair(it, pt), q)) != dp.end())
-    {
-        return dp[make_pair(make_pair(it, pt), q)];
+void find0(ll str, ll itn) {
+  ll status = dp[str][itn];
+  for (ll i = 0; i < n; ++i) {
+    if (status & (1 << i)) {
+      continue;
+    } else if (strs[i] > str && itns[i] > itn) {
+      continue;
     }
 
-    ll result = 0;
-    for (ll _q, i = 0; i < n; ++i)
-    {
-        _q = 1 << i;
-        if (_q & q)
-        {
-            continue;
-        }
-
-        if (info[i][0] <= it || info[i][1] <= pt)
-        {
-            result = max(result, 1 + solve(it + info[i][2], pt, _q | q));
-            result = max(result, 1 + solve(it, pt + info[i][2], _q | q));
-        }
-    }
-
-    return dp[make_pair(make_pair(it, pt), q)] = result;
+    
+  }
 }
 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
+int main(void) {
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
 
-    cin >> n;
-    for (ll i = 0; i < n; ++i)
-    {
-        cin >> info[i][0] >> info[i][1] >> info[i][2];
-    }
+  cin >> n;
+  for (ll i = 0; i < n; ++i) {
+    cin >> strs[i] >> itns[i] >> pnts[i];
+  }
 
-    cout << solve(1, 1, 0);
+  find0(1, 1);
 
-    return 0;
+  return 0;
 }
