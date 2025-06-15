@@ -15,23 +15,26 @@ typedef vector<ll> vll;
 typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
-#define FOR1(a, A) for (ll a = 0; a < A; ++a)
-#define FOR2(a, b, A, B)                                                       \
-  for (ll a = 0; a < A; ++a)                                                   \
-    for (ll b = 0; b < B; ++b)
+#define FOR(a, A) for (ll a = 0; a < A; ++a)
 
 cll N = 50, Height = 1e6,
     directions[8][2] = {{0, 1},  {0, -1}, {1, 0},  {-1, 0},
                         {1, -1}, {1, 1},  {-1, 1}, {-1, -1}};
-ll n, heights[N][N] = {}, ntgt = 0;
+ll n, mat[N][N] = {}, ntgt = 0, minHeight = Height, maxHeight = 0;
 bool isTgt[N][N] = {{}}, checked[N][N] = {{}};
 pll src;
+vll heights;
+set<ll> s;
 
 inline bool isValid(ll i, ll l) { return i >= 0 && i < n && l >= 0 && l < n; }
 
 bool isPossible(ll low, ll high) {
-  ll nget = 0;
-  memset(checked, 0, sizeof(checked));
+  if (mat[src.first][src.second] < low || mat[src.first][src.second] > high) {
+    return false;
+  }
+
+  ll nvisited = 0;
+  bool checked[N][N] = {{}};
   checked[src.first][src.second] = true;
   qpll q;
   q.push(src);
@@ -41,14 +44,14 @@ bool isPossible(ll low, ll high) {
 
     for (auto &d : directions) {
       ll ni = i + d[0], nl = l + d[1];
-      if (isValid(ni, nl) || checked[ni][nl]) {
+      if (!isValid(ni, nl) || checked[ni][nl]) {
         continue;
-      } else if (heights[ni][nl] < low || heights[ni][nl] > high) {
+      } else if (mat[ni][nl] < low || mat[ni][nl] > high) {
         continue;
       }
 
       if (isTgt[ni][nl]) {
-        ++nget;
+        ++nvisited;
       }
 
       checked[ni][nl] = true;
@@ -56,14 +59,38 @@ bool isPossible(ll low, ll high) {
     }
   }
 
-  return nget == ntgt;
+  return nvisited == ntgt;
+}
+
+ll findLow(ll high) {
+  ll st = minHeight, en = high, ans = -1;
+  while (st <= en) {
+    ll mid = (st + en) / 2;
+    if (isPossible(mid, high)) {
+      ans = mid, st = mid + 1;
+    } else {
+      en = mid - 1;
+    }
+  }
+
+  return ans;
+}
+
+ll findHigh(ll low) {
+  ll st = low, en = maxHeight, ans = -1;
+  while (st <= en) {
+    ll mid = (st + en) / 2;
+    if (isPossible(low, mid)) {
+      ans = mid, en = mid - 1;
+    } else {
+      st = mid + 1;
+    }
+  }
+
+  return ans;
 }
 
 int main(void) {
-  ios::sync_with_stdio(false);
-  cin.tie(NULL);
-  cout.tie(NULL);
-
   cin >> n;
   for (ll i = 0; i < n; ++i) {
     cin.ignore();
@@ -73,31 +100,32 @@ int main(void) {
       if (c == 'P') {
         src = {i, l};
       } else if (c == 'K') {
-        isTgt[i][l] = true;
-        ++ntgt;
+        isTgt[i][l] = true, ++ntgt;
       }
     }
   }
-  for (ll i = 0; i < n; ++i) {
-    for (ll l = 0; l < n; ++l) {
-      cin >> heights[i][l];
-    }
+
+  FOR(i, n) FOR(l, n) {
+    cin >> mat[i][l];
+    minHeight = min(minHeight, mat[i][l]),
+    maxHeight = max(maxHeight, mat[i][l]);
+    s.insert(mat[i][l]);
   }
 
-  ll result = Height;
-  for (ll low = 1; low <= heights[src.first][src.second]; ++low) {
-    ll st = low, en = Height, high = -1;
-    while (st <= en) {
-      ll mid = (st + en) / 2;
-      if (isPossible(low, mid)) {
-        high = mid, en = mid - 1;
-      } else {
-        st = mid + 1;
-      }
+  for (auto &height : s) {
+    heights.emplace_back(height);
+  }
+
+  ll low = 0, high = 0, result = Height;
+  while (high < heights.size()) {
+    if (isPossible(heights[low], heights[high])) {
+      result = min(result, heights[high] - heights[low]), ++low;
+    } else {
+      ++high;
     }
 
-    if (high != -1) {
-      result = min(result, high - low);
+    if (low > high) {
+      ++high;
     }
   }
 

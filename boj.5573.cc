@@ -16,19 +16,17 @@ typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
 #define FOR(a, A) for (ll a = 0; a < A; ++a)
 
-cll N = 50, H = 5e5, SUM = 5e5;
-ll n, heights[N] = {}, dp[N][SUM] = {};
+cll H = 1000, W = 1000, N = 1e7;
+ll h, w, n, dp[H][W][2];
+bool mat[H][W] = {{}};
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
 
-  cin >> n;
-  for (ll i = 0; i < n; ++i) {
-    cin >> heights[i];
-  }
-  sort(heights, heights + n);
+  cin >> h >> w >> n;
+  FOR(i, h) FOR(l, w) { cin >> mat[i][l]; }
 
   return 0;
 }
