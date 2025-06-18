@@ -16,27 +16,13 @@ typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
 #define FOR(a, A) for (ll a = 0; a < A; ++a)
 
-cll N = 50, STR = 1000, INR = 1000, PNT = 1000;
-ll n, strs[N] = {}, inrs[N] = {}, pnts[N] = {}, dp[STR + 1][INR + 1] = {{}};
+cll N = 2500, M = 4000, Price = 2500, Length = 2500;
+ll n, m;
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
-
-  cin >> n;
-  FOR(i, n) { cin >> strs[i] >> inrs[i] >> pnts[i]; }
-
-  memset(dp, -1, sizeof(dp));
-  dp[1][1] = 0;
-  FOR(qidx, n) {
-    ll str = strs[qidx], inr = inrs[qidx];
-    FOR(pstr, STR) FOR(pinr, INR) {
-      if (pstr >= str || pinr >= inr) {
-        dp[pstr+]
-      }
-    }
-  }
 
   return 0;
 }
