@@ -41,9 +41,9 @@ inline bool cmp1(ll a, ll b) {
 }
 
 int main(void) {
-  //  ios::sync_with_stdio(false);
-  //  cin.tie(NULL);
-  //  cout.tie(NULL);
+  ios::sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
 
   cin >> n >> prison.first >> prison.second;
   FOR(i, n) { cin >> points[i].first >> points[i].second; }
@@ -66,26 +66,25 @@ int main(void) {
     start = candidates[0];
     sort(candidates.begin() + 1, candidates.end(), cmp1);
 
+    isIncluded[candidates[0]] = true;
     ans.emplace_back(candidates[0]);
     candidates.pop_front();
+    isIncluded[candidates[0]] = true;
     ans.emplace_back(candidates[0]);
     candidates.pop_front();
     for (auto &idx : candidates) {
       while (ans.size() >= 2 &&
              ccw(points[ans[ans.size() - 2]], points[ans[ans.size() - 1]],
                  points[idx]) <= 0) {
+        isIncluded[ans.back()] = false;
         ans.pop_back();
       }
-
+      isIncluded[idx] = true;
       ans.emplace_back(idx);
     }
 
-    for (auto &idx : ans) {
-      if (points[idx] == prison) {
-        goto End;
-      } else {
-        isIncluded[idx] = true;
-      }
+    if (isIncluded[n]) {
+      goto End;
     }
 
     ++result;
