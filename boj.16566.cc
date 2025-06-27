@@ -14,13 +14,11 @@ typedef vector<ll> vll;
 typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
-#define FOR1(a, A) for (ll a = 0; a < A; ++a)
-#define FOR2(a, b, A, B)                                                       \
-  for (ll a = 0; a < A; ++a)                                                   \
-    for (ll b = 0; b < B; ++b)
+#define FOR(a, A) for (ll a = 0; a < A; ++a)
 
-cll N = 500, M = N, K = N;
+cll N = 4e6, M = N, K = 1e4;
 ll n, m, k;
+set<ll> nums;
 
 int main(void) {
   ios::sync_with_stdio(false);
@@ -28,8 +26,19 @@ int main(void) {
   cout.tie(NULL);
 
   cin >> n >> m >> k;
+  FOR(i, m) {
+    ll num;
+    cin >> num;
+    nums.insert(num);
+  }
 
-  
+  FOR(i, k) {
+    ll num;
+    cin >> num;
+    num = *nums.upper_bound(num);
+    cout << num << "\n";
+    nums.extract(num);
+  }
 
   return 0;
 }
