@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -16,9 +17,8 @@ typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
 #define FOR(a, A) for (ll a = 0; a < A; ++a)
 
-cll N = 4e6, M = N, K = 1e4;
-ll n, m, k;
-set<ll> nums;
+cll N = 4e6, M = 4e6, K = 1e4;
+ll n, m, k, cards[M] = {}, parents[N + 2] = {};
 
 int main(void) {
   ios::sync_with_stdio(false);
@@ -26,18 +26,15 @@ int main(void) {
   cout.tie(NULL);
 
   cin >> n >> m >> k;
-  FOR(i, m) {
-    ll num;
-    cin >> num;
-    nums.insert(num);
-  }
+  FOR(i, m) { cin >> cards[i]; }
+  sort(cards, cards + n);
+  set<ll> s(cards, cards + n);
 
   FOR(i, k) {
     ll num;
     cin >> num;
-    num = *nums.upper_bound(num);
-    cout << num << "\n";
-    nums.extract(num);
+    cout << (num = *s.upper_bound(num)) << "\n";
+    s.extract(num);
   }
 
   return 0;
