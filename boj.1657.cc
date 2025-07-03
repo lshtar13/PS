@@ -14,10 +14,7 @@ typedef vector<ll> vll;
 typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
-#define FOR1(a, A) for (ll a = 0; a < A; ++a)
-#define FOR2(a, b, A, B)                                                       \
-  for (ll a = 0; a < A; ++a)                                                   \
-    for (ll b = 0; b < B; ++b)
+#define FOR(a, A) for (ll a = 0; a < A; ++a)
 
 cll N = 14, M = 14, CLASS = 5;
 cll values[CLASS][CLASS] = {{10, 8, 7, 5, 1},
@@ -25,35 +22,39 @@ cll values[CLASS][CLASS] = {{10, 8, 7, 5, 1},
                             {7, 4, 3, 2, 1},
                             {5, 3, 2, 2, 1},
                             {1, 1, 1, 1, 0}};
-ll n, m, mat[N][M] = {{}};
-bool checked[N][M] = {{}};
+ll n, m, mat[N][M] = {{}}, dp[N][1 << M] = {{}};
 
-ll findMax(ll idx) {
-  ll i = idx / m, l = idx % m;
-  if (idx >= n * m) {
-    return 0;
-  } else if (checked[i][l]) {
-    return findMax(idx + 1);
+ll check(ll, ll);
+
+ll dfs(ll i, ll l, ll status, ll nstatus) {
+  if (l >= m) {
+    return check(i + 1, nstatus);
+  } else if (status & (1 << l)) {
+    return dfs(i, l + 1, status, nstatus);
   }
 
-  ll result = 0;
-  checked[i][l] = true;
-  // 한칸
-  result = max(result, findMax(idx + 1));
-  // 오른쪽
-  if (l + 1 < m) {
-    checked[i][l + 1] = true;
-    result = max(result, findMax(idx + 1) + values[mat[i][l]][mat[i][l + 1]]);
-    checked[i][l + 1] = false;
+  ll result = dfs(i, l + 1, status, nstatus);
+  if (l < m - 1 && !(status & (1 << (l + 1)))) {
+    result = max(result, values[mat[i][l]][mat[i][l + 1]] +
+                             dfs(i, l + 2, status, nstatus));
   }
-  // 아래쪽
-  if (i + 1 < n) {
-    checked[i + 1][l] = true;
-    result = max(result, findMax(idx + 1) + values[mat[i][l]][mat[i + 1][l]]);
-    checked[i + 1][l] = false;
+
+  if (i < n - 1) {
+    result = max(result, values[mat[i][l]][mat[i + 1][l]] +
+                             dfs(i, l + 1, status, nstatus | (1 << l)));
   }
 
   return result;
+}
+
+ll check(ll idx, ll status) {
+  if (idx == n) {
+    return 0;
+  } else if (dp[idx][status] != -1) {
+    return dp[idx][status];
+  }
+
+  return dp[idx][status] = dfs(idx, 0, status, 0);
 }
 
 int main(void) {
@@ -62,19 +63,17 @@ int main(void) {
   cout.tie(NULL);
 
   cin >> n >> m;
-  for (ll i = 0; i < n; ++i) {
+  FOR(i, n) {
     cin.ignore();
-    for (ll l = 0; l < m; ++l) {
+    FOR(l, m) {
       char c;
       cin >> c;
-      mat[i][l] = c - 'A';
-      if (mat[i][l] == CLASS) {
-        --mat[i][l];
-      }
+      mat[i][l] = min(4, c - 'A');
     }
   }
 
-  cout << findMax(0) << "\n";
+  memset(dp, -1, sizeof(dp));
+  cout << check(0, 0) << "\n";
 
   return 0;
 }
