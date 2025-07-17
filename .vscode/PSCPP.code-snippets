@@ -18,7 +18,7 @@
             "typedef vector<pll> vpll;",
             "typedef vector<vll> vvll;",
             "typedef vector<vpll> vvpll;",
-            "#define FOR(a, A) for (ll a = 0; a < A; ++a)",
+            "#define FOR(i, a, A) for (ll i = a; i < A; ++i)",
             "",
             "int main(void)",
             "{",
