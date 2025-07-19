@@ -14,29 +14,79 @@ typedef vector<ll> vll;
 typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
-#define FOR(a, A) for (ll a = 0; a < A; ++a)
+#define FOR(i, a, A) for (ll i = a; i < A; ++i)
 
-cll N = 500, K = 1e4;
-ll n, k, owners[N * 2] = {};
-bool checked[N * 2] = {};
+cll N = 1000, K = 1000, X = N;
+ll n, k, parents[N] = {}, pidx = 0, groups[N] = {}, gidx = 0, degrees[N] = {},
+         sizes[N + 1] = {};
+bool checked[N] = {}, results[N + 1] = {};
+deque<deque<ll>> sccs;
+vll companions[N], childs[N + 1], starts;
 
-bool check(ll i, ll l) {
-  for (auto idx : {i, l + n}) {
-    if (checked[idx]) {
-      continue;
-    }
+ll check0(ll node) {
+  if (parents[node] != -1) {
+    return parents[node];
+  }
 
-    checked[idx] = true;
-    if (owners[idx] == -1) {
-      owners[idx] = i * n + l;
-      return true;
-    } else if (check(owners[idx] / n, owners[idx] % n)) {
-      owners[idx] = i * n + l;
-      return true;
+  static stack<ll> s;
+  s.push(node);
+  ll parent = parents[node] = pidx++;
+
+  static bool checked[N] = {};
+  for (auto &companion : companions[node]) {
+    if (!checked[companion]) {
+      parents[node] = min(parents[node], check0(companion));
     }
   }
 
-  return false;
+  if (parent == parents[node]) {
+    deque<ll> scc;
+    while (!s.empty()) {
+      ll pnode = s.top();
+      scc.push_back(pnode);
+      s.pop();
+
+      checked[pnode] = true;
+      groups[pnode] = gidx;
+
+      if (pnode == node) {
+        break;
+      }
+    }
+
+    ++gidx;
+    sccs.emplace_back(scc);
+  }
+
+  return parents[node];
+}
+
+ll check1(ll group) {
+  for (auto &mem : sccs[group]) {
+    for (auto &companion : companions[mem]) {
+      if (groups[companion] != group && !checked[groups[companion]]) {
+        checked[groups[companion]] = true;
+        childs[group].emplace_back(groups[companion]);
+      }
+    }
+  }
+
+  return sccs[group].size();
+}
+
+void check2(ll group) {
+  bool cur[K + 1] = {};
+  cur[sizes[group]] = true;
+  for (auto &child : childs[group]) {
+    check2(child);
+    for (ll tgt = k; tgt >= 0; --tgt) {
+      for (ll prv = 0; prv <= tgt; ++prv) {
+        cur[tgt] |= cur[prv] && results[tgt - prv];
+      }
+    }
+  }
+
+  memcpy(results, cur, sizeof(results));
 }
 
 int main(void) {
@@ -44,20 +94,39 @@ int main(void) {
   cin.tie(NULL);
   cout.tie(NULL);
 
-  memset(owners, -1, sizeof(owners));
   cin >> n >> k;
-  FOR(s, k) {
-    ll i, l;
-    cin >> i >> l;
-    --i, --l;
-
-    memset(checked, 0, sizeof(checked));
-    check(i, l);
+  FOR(a, 0, n) {
+    ll b;
+    cin >> b;
+    companions[--b].emplace_back(a);
   }
 
-  ll result = 0;
-  FOR(i, n * 2) { result += bool(owners[i] != -1); }
-  cout << result << "\n";
+  // find scc
+  memset(parents, -1, sizeof(parents));
+  FOR(node, 0, n) {
+    if (!checked[node]) {
+      check0(node);
+    }
+  }
+
+  // make tree
+  memset(checked, 0, sizeof(checked));
+  FOR(group, 0, gidx) { sizes[group] = check1(group); }
+  FOR(group, 0, gidx) {
+    if (!checked[group]) {
+      childs[n].emplace_back(group);
+    }
+  }
+
+  // count
+  memset(checked, 0, sizeof(checked));
+  check2(n);
+  for (ll avail = k; avail >= 0; --avail) {
+    if (results[avail]) {
+      cout << avail << "\n";
+      break;
+    }
+  }
 
   return 0;
 }
