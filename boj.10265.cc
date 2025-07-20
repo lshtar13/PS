@@ -18,7 +18,8 @@ typedef vector<vpll> vvpll;
 
 cll N = 1000, K = 1000, X = N;
 ll n, k, parents[N] = {}, pidx = 0, groups[N] = {}, gidx = 0, degrees[N] = {},
-         sizes[N + 1] = {};
+         sizes[N + 1] = {}, components[N + 1][2] = {{}}, cidx = 0,
+         dp[K + 1][K + 1] = {{}};
 bool checked[N] = {}, results[N + 1] = {};
 deque<deque<ll>> sccs;
 vll companions[N], childs[N + 1], starts;
@@ -74,19 +75,13 @@ ll check1(ll group) {
   return sccs[group].size();
 }
 
-void check2(ll group) {
-  bool cur[K + 1] = {};
-  cur[sizes[group]] = true;
+ll check2(ll group) {
+  ll result = 1;
   for (auto &child : childs[group]) {
-    check2(child);
-    for (ll tgt = k; tgt >= 0; --tgt) {
-      for (ll prv = 0; prv <= tgt; ++prv) {
-        cur[tgt] |= cur[prv] && results[tgt - prv];
-      }
-    }
+    result += check2(group);
   }
 
-  memcpy(results, cur, sizeof(results));
+  return result;
 }
 
 int main(void) {
@@ -114,19 +109,22 @@ int main(void) {
   FOR(group, 0, gidx) { sizes[group] = check1(group); }
   FOR(group, 0, gidx) {
     if (!checked[group]) {
-      childs[n].emplace_back(group);
+      components[cidx][0] = sizes[group], components[cidx][1] = check2(group),
+      ++cidx;
     }
   }
 
-  // count
-  memset(checked, 0, sizeof(checked));
-  check2(n);
-  for (ll avail = k; avail >= 0; --avail) {
-    if (results[avail]) {
-      cout << avail << "\n";
-      break;
-    }
+  FOR(size, components[0][0], k + 1) {
+    dp[0][size] = min(size, components[0][1]);
   }
+  FOR(group, 1, gidx)
+  FOR(limit, 0, k)
+  FOR(size, components[group][0], min(limit, components[group][1]) + 1) {
+    dp[group][limit] =
+        max(dp[group][limit], dp[group - 1][limit - size] + size);
+  }
+
+  cout << dp[gidx - 1][k] << "\n";
 
   return 0;
 }
