@@ -14,15 +14,23 @@ typedef vector<ll> vll;
 typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
-#define FOR1(a, A) for (ll a = 0; a < A; ++a)
-#define FOR2(a, b, A, B)                                                       \
-  for (ll a = 0; a < A; ++a)                                                   \
-    for (ll b = 0; b < B; ++b)
+#define FOR(i, a, A) for (ll i = a; i < A; ++i)
+#define IFOR(i, a, A) for (ll i = a; i >= A; --i)
+
+cll N = 2e5, A = 4e4, B = 4e4, Mod = 4e4;
+ll n;
+pll infos[N];
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
+
+  cin >> n;
+  FOR(i, 0, n) { cin >> infos[i].first >> infos[i].second; }
+  sort(infos, infos + n);
+
+  
 
   return 0;
 }
