@@ -14,15 +14,33 @@ typedef vector<ll> vll;
 typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
-#define FOR1(a, A) for (ll a = 0; a < A; ++a)
-#define FOR2(a, b, A, B)                                                       \
-  for (ll a = 0; a < A; ++a)                                                   \
-    for (ll b = 0; b < B; ++b)
+#define FOR(i, a, A) for (ll i = a; i < A; ++i)
+#define IFOR(i, a, A) for (ll i = a; i >= A; --i)
+
+cll S = 1e6, M = 1e5;
+string str;
+ll m, pi[S] = {};
+
+ll F(ll idx) { return 0; }
 
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
+
+  cin >> str >> m;
+  reverse(str.begin(), str.end());
+  FOR(i, 1, str.length()) {
+    ll prv = pi[i - 1];
+    while (prv && str[i] != str[prv]) {
+      prv = pi[prv - 1];
+    }
+
+    pi[i] = str[i] == str[prv] ? prv + 1 : 0;
+  }
+
+  
+
 
   return 0;
 }

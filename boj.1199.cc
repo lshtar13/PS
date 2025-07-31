@@ -14,35 +14,37 @@ typedef vector<ll> vll;
 typedef vector<pll> vpll;
 typedef vector<vll> vvll;
 typedef vector<vpll> vvpll;
-#define FOR1(a, A) for (ll a = 0; a < A; ++a)
-#define FOR2(a, b, A, B)                                                       \
-  for (ll a = 0; a < A; ++a)                                                   \
-    for (ll b = 0; b < B; ++b)
+#define FOR(i, a, A) for (ll i = a; i < A; ++i)
+#define IFOR(i, a, A) for (ll i = a; i >= A; --i)
 
 cll N = 1000;
-ll n, mat[N][N] = {{}}, visited[N] = {};
+ll n, nedges = 0, mat[N][N] = {{}};
+vll edges[N];
 
 bool dfs(ll node) {
-  for (ll av = 0; av < n; ++av) {
-    if (!mat[node][av]) {
-      continue;
-    }
-
-    if (visited[node] == n && visited[av] == 1) {
-      goto SUCCESS;
-    } else if (!visited[av]) {
-      visited[av] = visited[node] + 1;
-      if (dfs(av)) {
-        goto SUCCESS;
-      }
-      visited[av] = 0;
+  if (nedges == 0) {
+    if (!node) {
+      cout << node + 1 << " ";
+      return true;
+    } else {
+      return false;
     }
   }
 
+  for (auto &av : edges[node]) {
+    if (mat[node][av] <= 0) {
+      continue;
+    }
+
+    --mat[node][av], --mat[av][node], --nedges;
+    if (dfs(av)) {
+      cout << node + 1 << " ";
+      return true;
+    }
+    ++mat[node][av], ++mat[av][node], ++nedges;
+  }
+
   return false;
-SUCCESS:
-  cout << node << "\n";
-  return true;
 }
 
 int main(void) {
@@ -50,13 +52,16 @@ int main(void) {
   cin.tie(NULL);
   cout.tie(NULL);
 
+  // dfs?
   cin >> n;
-  FOR2(i, l, n, n) { cin >> mat[i][l]; }
+  FOR(i, 0, n) FOR(l, 0, n) {
+    cin >> mat[i][l];
+    nedges += mat[i][l];
+    edges[i].emplace_back(l);
+  }
+  nedges /= 2;
 
-  visited[0] = 1;
-  if (!dfs(0)) {
-    cout << -1 << "\n";
-  };
+  dfs(0);
 
   return 0;
 }
