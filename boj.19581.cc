@@ -20,9 +20,9 @@ typedef vector<vpll> vvpll;
 cll N = 1e5;
 ll n;
 vpll edges[N];
-bool visited[N];
+bool visited[4][N] = {{}};
 
-pll dfs(ll node) {
+pll dfs(ll node, bool visited[N]) {
   pll result(0, node);
   visited[node] = true;
   for (auto &p : edges[node]) {
@@ -31,7 +31,7 @@ pll dfs(ll node) {
       continue;
     }
 
-    pll nresult = dfs(av);
+    pll nresult = dfs(av, visited);
     nresult.first += w;
     result = max(result, nresult);
   }
@@ -54,19 +54,15 @@ int main(void) {
   }
 
   ll end0, end1, end, diameter, result = 0;
-  memset(visited, 0, sizeof(visited));
-  tie(diameter, end0) = dfs(0);
-  memset(visited, 0, sizeof(visited));
-  tie(diameter, end1) = dfs(end0);
+  tie(diameter, end0) = dfs(0, visited[0]);
+  tie(diameter, end1) = dfs(end0, visited[1]);
 
-  memset(visited, 0, sizeof(visited));
-  visited[end1] = true;
-  tie(diameter, end) = dfs(end0);
+  visited[2][end1] = true;
+  tie(diameter, end) = dfs(end0, visited[2]);
   result = max(result, diameter);
 
-  memset(visited, 0, sizeof(visited));
-  visited[end0] = true;
-  tie(diameter, end) = dfs(end1);
+  visited[3][end0] = true;
+  tie(diameter, end) = dfs(end1, visited[3]);
   result = max(result, diameter);
 
   cout << result << "\n";
